@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waste Points Wallet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            margin-top: 50px;
+        }
+        .input-section {
+            margin: 20px;
+        }
+        input, button {
+            padding: 8px;
+            margin: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result, #error {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        #result {
+            color: green;
+        }
+        #error {
+            color: red;
+        }
+        .plastic-section, .glass-section, .paper-section {
+            background-color: #e0f7fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .glass-section {
+            background-color: #ffe0b2;
+        }
+        .paper-section {
+            background-color: #c8e6c9;
+        }
+        .points-info {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Waste Points Wallet</h1>
+
+    <!-- Login Section -->
+    <div id="login-section">
+        <h2>Login</h2>
+        <input type="email" id="email" placeholder="Enter your email" required>
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <button onclick="login()">Login</button>
+        <button onclick="register()">Register</button>
+    </div>
+
+    <!-- Main Content (hidden until login) -->
+    <div id="main-content" style="display:none;">
+        <!-- Plastic Section -->
+        <div class="input-section plastic-section">
+            <label for="plasticAmount">Enter total liters of plastic:</label>
+            <input type="number" id="plasticAmount" placeholder="Enter liters" min="0">
+            <div class="points-info">Plastic: 2.5 points per liter</div>
+        </div>
+
+        <!-- Glass Section -->
+        <div class="input-section glass-section">
+            <label for="glassAmount">Enter total liters of glass:</label>
+            <input type="number" id="glassAmount" placeholder="Enter liters" min="0">
+            <div class="points-info">Glass: 4 points per liter</div>
+        </div>
+
+        <!-- Paper Section -->
+        <div class="input-section paper-section">
+            <label for="paperAmount">Enter total kilograms of paper:</label>
+            <input type="number" id="paperAmount" placeholder="Enter kilograms" min="0">
+            <div class="points-info">Paper: 1.5 points per kilogram</div>
+        </div>
+
+        <button onclick="calculatePoints()">Calculate Points</button>
+        <button onclick="logout()">Logout</button>
+
+        <div id="error"></div>
+        <div id="result"></div>
+
+        <!-- Wallet Section -->
+        <h2>Your Wallet</h2>
+        <div id="wallet">Total Points: 0</div>
+    </div>
+
+    <script>
+        function login() {
+            let email = document.getElementById('email').value;
+            let password = document.getElementById('password').value;
+            
+            if (email === "" || password === "") {
+                alert('Please enter both email and password.');
+                return;
+            }
+
+            let storedPassword = localStorage.getItem(email);
+            if (storedPassword && storedPassword === password) {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                let storedPoints = localStorage.getItem(email + '_points') || 0;
+                document.getElementById('wallet').innerHTML = `Total Points: ${storedPoints}`;
+            } else {
+                alert('Invalid login credentials or user does not exist.');
+            }
+        }
+
+        function register() {
+            let email = document.getElementById('email').value;
+            let password = document.getElementById('password').value;
+            
+            if (email === "" || password === "") {
+                alert('Please enter both email and password.');
+                return;
+            }
+
+            if (password.length < 8) {
+                alert('Password must be at least 8 digits long.');
+                return;
+            }
+
+            if (localStorage.getItem(email)) {
+                alert('This email is already registered. Please use another email.');
+                return;
+            }
+
+            localStorage.setItem(email, password);
+            localStorage.setItem(email + '_points', 0); 
+            alert('Registration successful! You can now log in.');
+        }
+
+        function calculatePoints() {
+            let plasticAmount = parseInt(document.getElementById('plasticAmount').value) || 0;
+            let glassAmount = parseInt(document.getElementById('glassAmount').value) || 0;
+            let paperAmount = parseInt(document.getElementById('paperAmount').value) || 0;
+
+            let totalPoints = (plasticAmount * 2.5) + (glassAmount * 4) + (paperAmount * 1.5);
+
+            document.getElementById('result').innerHTML = `Total Points: ${totalPoints} points`;
+            let email = document.getElementById('email').value;
+            localStorage.setItem(email + '_points', totalPoints);
+            document.getElementById('wallet').innerHTML = `Total Points: ${totalPoints}`;
+        }
+
+        function logout() {
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('main-content').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
